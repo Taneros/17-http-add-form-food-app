@@ -14,6 +14,7 @@ const AvailableMeals = () => {
       price: 0,
     },
   ]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // !! Gotcha: don't put async in the useEfffect callback, rather create sync fn inside callback
@@ -38,6 +39,7 @@ const AvailableMeals = () => {
         console.log(`fetchMealsData`, fetchMealsData);
 
         setMeals(fetchMealsData);
+        setIsLoading(false);
       } catch (error) {
         debugger;
         console.error(error, 'Fetching Data Failed!');
@@ -48,7 +50,12 @@ const AvailableMeals = () => {
     return () => {};
   }, []);
 
-  if (!meals.length) return null;
+  if (isLoading)
+    return (
+      <section className={classes.MealsLoading}>
+        <p>Loading...</p>
+      </section>
+    );
 
   const mealsList = meals.map((meal) => (
     <MealItem
