@@ -15,6 +15,7 @@ const AvailableMeals = () => {
     },
   ]);
   const [isLoading, setIsLoading] = useState(true);
+  const [httpError, setHttpError] = useState(null);
 
   useEffect(() => {
     // !! Gotcha: don't put async in the useEfffect callback, rather create sync fn inside callback
@@ -23,6 +24,13 @@ const AvailableMeals = () => {
         const response = await fetch(
           `https://http-add-form-food-store-default-rtdb.europe-west1.firebasedatabase.app/meals.json`,
         );
+
+        console.log(`response`, response);
+
+        if (!response.ok) {
+          throw new Error('Something went wrong while fetching data');
+        }
+
         const data = await response.json();
 
         console.log(`data`, data);
@@ -41,11 +49,12 @@ const AvailableMeals = () => {
         setMeals(fetchMealsData);
         setIsLoading(false);
       } catch (error) {
+        setIsLoading(false);
+        setHttpError(error.message);
         debugger;
         console.error(error, 'Fetching Data Failed!');
       }
     };
-
     fetchMealsData();
     return () => {};
   }, []);
@@ -56,6 +65,14 @@ const AvailableMeals = () => {
         <p>Loading...</p>
       </section>
     );
+
+  if (httpError) {
+    return (
+      <section className={classes.MealsFetchError}>
+        <p>{httpError}</p>
+      </section>
+    );
+  }
 
   const mealsList = meals.map((meal) => (
     <MealItem
