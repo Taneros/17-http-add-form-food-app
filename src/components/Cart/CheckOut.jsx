@@ -2,15 +2,11 @@ import classes from './CheckOut.module.css';
 
 import react, {useRef, useState} from 'react';
 
-const isEmpty = (value) => {
-  return value.trim() === '';
-};
+const hasText = (value) => value.trim() !== '';
 
-const isNotfiveChars = (value) => {
-  return value.trim().length !== 5;
-};
+const hasFiveChars = (value) => value.trim().length >= 5;
 
-const Checkout = (props) => {
+const Checkout = ({onConfirm, onCancel}) => {
   const [fromInputsValidity, setFromInputsValidity] = useState({
     name: true,
     street: true,
@@ -32,24 +28,27 @@ const Checkout = (props) => {
     const enteredCity = cityInputRef.current.value;
 
     setFromInputsValidity({
-      name: !isEmpty(enteredName),
-      street: !isEmpty(enteredStreet),
-      city: !isEmpty(enteredCity),
-      postalCode: !isEmpty(enteredPostal) && isNotfiveChars(enteredPostal),
+      name: hasText(enteredName),
+      street: hasText(enteredStreet),
+      city: hasText(enteredCity),
+      postalCode: hasText(enteredPostal) && hasFiveChars(enteredPostal),
     });
 
     const formIsValid = ![enteredName, enteredStreet, enteredPostal, enteredCity]
       .map((el, idx) => {
-        if (!idx === 3) return !isEmpty(el);
-        return isNotfiveChars(el) && !isEmpty(el);
+        if (!idx === 3) return hasText(el);
+        return hasFiveChars(el) && hasText(el);
       })
       .includes(false);
 
-    if (!formIsValid) {
-      return;
-    }
+    if (!formIsValid) return;
 
-    // Submit
+    onConfirm({
+      name: enteredName,
+      street: enteredStreet,
+      city: enteredCity,
+      postalCode: enteredPostal,
+    });
   };
 
   return (
@@ -75,7 +74,7 @@ const Checkout = (props) => {
         {!fromInputsValidity.city && <p>City name is not valid!</p>}
       </div>
       <div className={classes.actions}>
-        <button type="button" onClick={props.onCancel}>
+        <button type="button" onClick={onCancel}>
           Cancel
         </button>
         <button className={classes.submit}>Confirm</button>
