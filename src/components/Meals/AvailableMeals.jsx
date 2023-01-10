@@ -18,22 +18,13 @@ const AvailableMeals = () => {
   const [httpError, setHttpError] = useState(null);
 
   useEffect(() => {
-    // !! Gotcha: don't put async in the useEfffect callback, rather create sync fn inside callback
     const fetchMealsData = async () => {
       try {
-        const response = await fetch(
-          `https://http-add-form-food-store-default-rtdb.europe-west1.firebasedatabase.app/meals.json`,
-        );
+        const response = await fetch(`https://http-add-form-food-store-default-rtdb.europe-west1.firebasedatabase.app/meals.json`);
 
-        console.log(`response`, response);
-
-        if (!response.ok) {
-          throw new Error('Something went wrong while fetching data');
-        }
+        if (!response.ok) throw new Error('Something went wrong while fetching data');
 
         const data = await response.json();
-
-        console.log(`data`, data);
 
         const fetchMealsData = [];
 
@@ -44,7 +35,6 @@ const AvailableMeals = () => {
           }
           fetchMealsData.push(parseData);
         }
-        console.log(`fetchMealsData`, fetchMealsData);
 
         setMeals(fetchMealsData);
         setIsLoading(false);
@@ -74,15 +64,7 @@ const AvailableMeals = () => {
     );
   }
 
-  const mealsList = meals.map((meal) => (
-    <MealItem
-      key={meal.id}
-      id={meal.id}
-      name={meal.name}
-      description={meal.description}
-      price={meal.price}
-    />
-  ));
+  const mealsList = meals.map((meal) => <MealItem key={meal.id} id={meal.id} name={meal.name} description={meal.description} price={meal.price} />);
 
   return (
     <section className={classes.meals}>
