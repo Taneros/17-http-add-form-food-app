@@ -23,6 +23,34 @@ const Cart = (props) => {
     cartCtx.addItem(item);
   };
 
+  const handleOrder = () => {
+    setIsCheckout(true);
+  };
+
+  const submitOrderHandler = async (userData) => {
+    try {
+      setIsSubmitting(true);
+      const response = await fetch('https://http-add-form-food-store-default-rtdb.europe-west1.firebasedatabase.app/orders.json', {
+        method: 'POST',
+        body: JSON.stringify({
+          user: userData,
+          orderedItems: cartCtx.items,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Something went wrong while posting an item.');
+
+      setIsSubmitting(false);
+      setDidSubmit(true);
+      cartCtx.clearCard();
+    } catch (error) {
+      setIsSubmitting(false);
+      setDidSubmit(false);
+      debugger;
+      console.error(error, 'Posting Data Failed!');
+    }
+  };
+
   const cartItems = (
     <ul className={classes['cart-items']}>
       {cartCtx.items.map((item) => (
@@ -30,23 +58,6 @@ const Cart = (props) => {
       ))}
     </ul>
   );
-
-  const handleOrder = () => {
-    setIsCheckout(true);
-  };
-
-  const submitOrderHandler = async (userData) => {
-    setIsSubmitting(true);
-    await fetch('https://http-add-form-food-store-default-rtdb.europe-west1.firebasedatabase.app/orders.json', {
-      method: 'POST',
-      body: JSON.stringify({
-        user: userData,
-        orderedItems: cartCtx.items,
-      }),
-    });
-    setIsSubmitting(false);
-    setDidSubmit(true);
-  };
 
   const modalAction = (
     <div className={classes.actions}>
@@ -79,14 +90,9 @@ const Cart = (props) => {
     <>
       <p>Successfully sent the order!</p>
       <div className={classes.actions}>
-        <button className={classes['button--alt']} onClick={props.onClose}>
+        <button className={classes.button} onClick={props.onClose}>
           Close
         </button>
-        {hasItems && (
-          <button className={classes.button} onClick={handleOrder}>
-            Order
-          </button>
-        )}
       </div>
     </>
   );
